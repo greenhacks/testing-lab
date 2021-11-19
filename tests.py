@@ -1,8 +1,7 @@
 """Testsq for Balloonicorn's Flask app."""
 
-import unittest
+import unittest 
 import party
-
 
 class PartyTests(unittest.TestCase):
     """Tests for my party site."""
@@ -24,10 +23,15 @@ class PartyTests(unittest.TestCase):
 
         # # FIXME: Add a test to show we haven't RSVP'd yet
         # print("FIXME")
+        
+        rsvp_info = {'name': "", 'email': ""}
 
-        # users are only supposed to see the homepage if they haven't rsvp'ed
-        result = self.client.get("/")
-        self.assertIn(b"Please RSVP", result.data)
+        result = self.client.post("/rsvp", data=rsvp_info)
+
+        # users are only supposed to see the homepage if they haven't rsvp'ed.
+        # if user has rsvp'ed, they should see "Party Details
+        # result = self.client.get('/rsvp')
+        self.assertNotIn(b"Party Details", result.data)
 
     def test_rsvp(self):
         """Do RSVPed users see the correct view?"""
@@ -38,14 +42,22 @@ class PartyTests(unittest.TestCase):
                                   follow_redirects=True)
 
         # FIXME: check that once we log in we see party details--but not the form!
-        print("FIXME")
+        
+        self.assertIn(b"Party Details", result.data)
+        self.assertNotIn(b"Please RSVP", result.data)
+
+        # print("FIXME")
 
     def test_rsvp_mel(self):
         """Can we keep Mel out?"""
 
         # FIXME: write a test that mel can't invite himself
-        pass
-        print("FIXME")
+
+        result = self.client.post("/rsvp", data={'name': 'Mel Melipolski', 'email': 'mel@ubermelon.com'},
+                                    follow_redirects=True)
+        self.assertNotIn(b"Treats", result.data)
+        # pass
+        # print("FIXME")
 
 
 if __name__ == "__main__":
